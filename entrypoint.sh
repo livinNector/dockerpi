@@ -90,12 +90,13 @@ if $ENABLEQTEST; then
 	QTESTPARAMS="$QTESTPARAMS -qtest unix:$QTESTSOCKET"
 fi
 
-gpio_emulator="${2:-vgpio}"
+gpio_emulator="${2:-vgpio\.py}"
 chmod +x "$gpio_emulator"
 cp "$gpio_emulator" /
-if [ "$gpio_emulator" = "vgpio" ]; then
-  /vgpio loop &
+if [ "$gpio_emulator" = "vgpio.py" ]; then
+  /vgpio.py loop &
 else
+  chmod +x /"$(basename $gpio_emulator)"
   /"$(basename $gpio_emulator)" &
 fi
 sleep 5
