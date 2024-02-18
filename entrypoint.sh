@@ -81,6 +81,24 @@ if [ "${kernel}" = "" ] || [ "${dtb}" = "" ]; then
   exit 2
 fi
 
+ENABLEQTEST=true
+#ENABLEQTEST=false
+QTESTSOCKET="/tmp/tmp-gpio.sock"
+
+QTESTPARAMS=""
+if $ENABLEQTEST; then
+	QTESTPARAMS="$QTESTPARAMS -qtest unix:$QTESTSOCKET"
+fi
+
+gpio_emulator="${2:-vgpio}"
+chmod +x "$gpio_emulator"
+cp "$gpio_emulator" /
+if [ "$gpio_emulator" = "vgpio" ]; then
+  /vgpio loop &
+else
+  /"$(basename $gpio_emulator)" &
+fi
+sleep 5
 echo "Booting QEMU machine \"${machine}\" with kernel=${kernel} dtb=${dtb}"
 exec ${emulator} \
   --machine "${machine}" \
@@ -93,4 +111,5 @@ exec ${emulator} \
   --append "rw earlyprintk loglevel=8 console=ttyAMA0,115200 dwc_otg.lpm_enable=0 root=${root} rootwait panic=1 ${append}" \
   --no-reboot \
   --display none \
-  --serial mon:stdio
+  --serial mon:stdio \
+  $QTESTPARAMS 2> /dev/null

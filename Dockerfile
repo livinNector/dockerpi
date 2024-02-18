@@ -86,7 +86,8 @@ RUN cd /tmp && \
 
 VOLUME /sdcard
 
-RUN python3 -m pip install pexpect qemu-rpi-gpio
+RUN python3 -m pip install pexpect 
+ADD https://github.com/livinNector/qemu-rpi-gpio/raw/master/qemu-rpi-gpio /vgpio
 ADD ./entrypoint.sh /entrypoint.sh
 ENTRYPOINT ["./entrypoint.sh"]
 
